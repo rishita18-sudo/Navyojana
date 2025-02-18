@@ -1,0 +1,8 @@
+<suite name="Sequential Suite">
+    <test name="Single Browser Test">
+        <parameter name="browser" value="chrome"/>
+        <classes>
+            <class name="classes.TestDataDriven"/>
+        </classes>
+    </test>
+</suite>
