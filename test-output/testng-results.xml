@@ -1,71 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testng-results ignored="0" total="1" passed="0" failed="1" skipped="0">
+<testng-results ignored="0" total="1" passed="1" failed="0" skipped="0">
   <reporter-output>
   </reporter-output>
-  <suite started-at="2025-02-18T15:40:56 IST" name="Suite" finished-at="2025-02-18T15:41:30 IST" duration-ms="34703">
+  <suite started-at="2025-02-20T12:03:26 IST" name="TestSuite" finished-at="2025-02-20T12:04:29 IST" duration-ms="62814">
     <groups>
     </groups>
-    <test started-at="2025-02-18T15:40:56 IST" name="Test" finished-at="2025-02-18T15:41:30 IST" duration-ms="34703">
-      <class name="classes.TestDataDriven">
-        <test-method is-config="true" signature="setUp(java.lang.String)[pri:0, instance:classes.TestDataDriven@56c9bbd8]" started-at="2025-02-18T15:40:56 IST" name="setUp" finished-at="2025-02-18T15:41:13 IST" duration-ms="17704" status="PASS">
-          <params>
-            <param index="0">
-              <value>
-                <![CDATA[chrome]]>
-              </value>
-            </param>
-          </params>
+    <test started-at="2025-02-20T12:03:26 IST" name="ExcelTestExecution" finished-at="2025-02-20T12:04:29 IST" duration-ms="62814">
+      <class name="classes.TestExecutor">
+        <test-method is-config="true" signature="setUp()[pri:0, instance:classes.TestExecutor@c430e6c]" started-at="2025-02-20T12:03:26 IST" name="setUp" finished-at="2025-02-20T12:03:43 IST" duration-ms="16746" status="PASS">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- setUp -->
-        <test-method signature="executeTestSteps()[pri:0, instance:classes.TestDataDriven@56c9bbd8]" started-at="2025-02-18T15:41:13 IST" name="executeTestSteps" finished-at="2025-02-18T15:41:28 IST" duration-ms="15034" status="FAIL">
-          <exception class="java.lang.AssertionError">
-            <message>
-              <![CDATA[Test failed due to an exception for element: //span[@aria-label='Admiral SuperIntendent']]]>
-            </message>
-            <full-stacktrace>
-              <![CDATA[java.lang.AssertionError: Test failed due to an exception for element: //span[@aria-label='Admiral SuperIntendent']
-at org.testng.Assert.fail(Assert.java:111)
-at classes.TestDataDriven.executeTestSteps(TestDataDriven.java:110)
-at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
-at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-at java.base/java.lang.reflect.Method.invoke(Method.java:568)
-at org.testng.internal.invokers.MethodInvocationHelper.invokeMethod(MethodInvocationHelper.java:139)
-at org.testng.internal.invokers.TestInvoker.invokeMethod(TestInvoker.java:664)
-at org.testng.internal.invokers.TestInvoker.invokeTestMethod(TestInvoker.java:228)
-at org.testng.internal.invokers.MethodRunner.runInSequence(MethodRunner.java:63)
-at org.testng.internal.invokers.TestInvoker$MethodInvocationAgent.invoke(TestInvoker.java:961)
-at org.testng.internal.invokers.TestInvoker.invokeTestMethods(TestInvoker.java:201)
-at org.testng.internal.invokers.TestMethodWorker.invokeTestMethods(TestMethodWorker.java:148)
-at org.testng.internal.invokers.TestMethodWorker.run(TestMethodWorker.java:128)
-at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
-at org.testng.TestRunner.privateRun(TestRunner.java:819)
-at org.testng.TestRunner.run(TestRunner.java:619)
-at org.testng.SuiteRunner.runTest(SuiteRunner.java:443)
-at org.testng.SuiteRunner.runSequentially(SuiteRunner.java:437)
-at org.testng.SuiteRunner.privateRun(SuiteRunner.java:397)
-at org.testng.SuiteRunner.run(SuiteRunner.java:336)
-at org.testng.SuiteRunnerWorker.runSuite(SuiteRunnerWorker.java:52)
-at org.testng.SuiteRunnerWorker.run(SuiteRunnerWorker.java:95)
-at org.testng.TestNG.runSuitesSequentially(TestNG.java:1301)
-at org.testng.TestNG.runSuitesLocally(TestNG.java:1228)
-at org.testng.TestNG.runSuites(TestNG.java:1134)
-at org.testng.TestNG.run(TestNG.java:1101)
-at org.testng.remote.AbstractRemoteTestNG.run(AbstractRemoteTestNG.java:115)
-at org.testng.remote.RemoteTestNG.initAndRun(RemoteTestNG.java:251)
-at org.testng.remote.RemoteTestNG.main(RemoteTestNG.java:77)
-]]>
-            </full-stacktrace>
-          </exception> <!-- java.lang.AssertionError -->
+        <test-method signature="executeTestSteps()[pri:0, instance:classes.TestExecutor@c430e6c]" started-at="2025-02-20T12:03:43 IST" name="executeTestSteps" finished-at="2025-02-20T12:04:28 IST" duration-ms="45638" status="PASS">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- executeTestSteps -->
-        <test-method is-config="true" signature="tearDown()[pri:0, instance:classes.TestDataDriven@56c9bbd8]" started-at="2025-02-18T15:41:28 IST" name="tearDown" finished-at="2025-02-18T15:41:30 IST" duration-ms="1877" status="PASS">
+        <test-method is-config="true" signature="tearDown()[pri:0, instance:classes.TestExecutor@c430e6c]" started-at="2025-02-20T12:04:28 IST" name="tearDown" finished-at="2025-02-20T12:04:29 IST" duration-ms="371" status="PASS">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- tearDown -->
-      </class> <!-- classes.TestDataDriven -->
-    </test> <!-- Test -->
-  </suite> <!-- Suite -->
+      </class> <!-- classes.TestExecutor -->
+    </test> <!-- ExcelTestExecution -->
+  </suite> <!-- TestSuite -->
 </testng-results>
