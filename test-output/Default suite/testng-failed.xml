@@ -3,14 +3,11 @@
 <suite name="Failed suite [Default suite]" guice-stage="DEVELOPMENT">
   <test thread-count="5" name="Default test(failed)">
     <classes>
-      <class name="classes.TestDataDriven">
+      <class name="classes.TestExecutor">
         <methods>
-          <include name="createDriver"/>
-          <include name="setUp"/>
-          <include name="tearDown"/>
-          <include name="testLogin" invocation-numbers="2"/>
+          <include name="executeStep"/>
         </methods>
-      </class> <!-- classes.TestDataDriven -->
+      </class> <!-- classes.TestExecutor -->
     </classes>
   </test> <!-- Default test(failed) -->
 </suite> <!-- Failed suite [Default suite] -->

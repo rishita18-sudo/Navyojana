@@ -1,8 +1,8 @@
-<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
-<suite name="TestSuite">
-    <test name="ExcelTestExecution">
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="SeleniumTestSuite">
+    <test name="ExcelDrivenTest">
         <classes>
-            <class name="classes.TestExecutor"/>
+            <class name="classes.TestExecutor1"/>
         </classes>
     </test>
 </suite>
