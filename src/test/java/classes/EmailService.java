@@ -7,11 +7,11 @@ import java.util.Properties;
 
 public class EmailService {
     private final String senderEmail = "testmail4rnd@gmail.com";
-    private final String senderPassword = "iqmzwumlwsytmeqp";
+    private final String senderPassword = "iqmzwumlwsytmeqp";  // App Password
     private final String smtpHost = "smtp.gmail.com";
     private final int smtpPort = 587;
 
-    public void sendEmailWithAttachment(String recipientEmail, String subject, String reportPath, String zipFilePath, String summaryMessage) {
+    public void sendEmailWithAttachment(String recipientEmail, String subject, String reportFilePath, String zipFilePath, int passed, int total) {
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
@@ -30,30 +30,31 @@ public class EmailService {
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientEmail));
             message.setSubject(subject);
 
-            // Create email body
+            String summaryMessage = String.format("Test Execution Summary:\n\n✔ %d out of %d PASSED\n\nAttached: Test Report & Execution Files.", passed, total);
+            
             MimeBodyPart messageBodyPart = new MimeBodyPart();
-            messageBodyPart.setText(summaryMessage + "\n\nPlease find the attached test report.");
+            messageBodyPart.setText(summaryMessage);
 
-            // Attachments
             Multipart multipart = new MimeMultipart();
             multipart.addBodyPart(messageBodyPart);
-            addAttachment(multipart, reportPath);
-            addAttachment(multipart, zipFilePath);
-            message.setContent(multipart);
 
+            if (reportFilePath != null) {
+                MimeBodyPart reportAttachment = new MimeBodyPart();
+                reportAttachment.attachFile(new File(reportFilePath));
+                multipart.addBodyPart(reportAttachment);
+            }
+
+            if (zipFilePath != null) {
+                MimeBodyPart zipAttachment = new MimeBodyPart();
+                zipAttachment.attachFile(new File(zipFilePath));
+                multipart.addBodyPart(zipAttachment);
+            }
+
+            message.setContent(multipart);
             Transport.send(message);
-            System.out.println("✅ Email sent successfully to " + recipientEmail);
+            System.out.println("📧 Email sent successfully with attachments.");
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    private void addAttachment(Multipart multipart, String filePath) throws Exception {
-        File file = new File(filePath);
-        if (file.exists()) {
-            MimeBodyPart attachmentPart = new MimeBodyPart();
-            attachmentPart.attachFile(file);
-            multipart.addBodyPart(attachmentPart);
         }
     }
 }

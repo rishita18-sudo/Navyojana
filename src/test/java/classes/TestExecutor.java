@@ -20,7 +20,7 @@ public class TestExecutor {
     public void setUp() {
         WebDriverManager.chromedriver().setup(); // Setup ChromeDriver
         driver = new ChromeDriver();
-        driver.get("https://qa-navyojna.epps-erp.in/");
+        driver.get("https://dev-navyojna.epps-erp.in/");
     }
 
     @Test

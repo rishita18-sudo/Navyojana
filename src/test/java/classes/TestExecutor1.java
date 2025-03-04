@@ -2,58 +2,52 @@ package classes;
 
 import com.aventstack.extentreports.*;
 import com.aventstack.extentreports.reporter.ExtentSparkReporter;
+import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.annotations.*;
 import io.github.bonigarcia.wdm.WebDriverManager;
 
-import java.awt.Desktop;
+import java.awt.*;
 import java.io.*;
 import java.nio.file.*;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Duration;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 public class TestExecutor1 {
     WebDriver driver;
-    String excelPath = "E:\\testData.xlsx"; 
+    String excelPath = "E:/testData.xlsx";
     String baseFolder = "E:/screenshots of navyojana test/";
-    String timestamp = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
-    String reportPath = baseFolder + timestamp + "/SparkReport.html";
-    String screenshotFolder = baseFolder + timestamp + "/screenshots/";
-    String testSummary="";
-
+    String reportPath;
+    String screenshotFolder;
+    String zipFilePath;
     ExtentReports extent;
     ExtentTest test;
-    EmailService emailService = new EmailService(); 
-
-    int passedTests = 0;
-    int failedTests = 0;
+    EmailService emailService = new EmailService();
 
     @BeforeTest
-    public void setUp() {
+    public void setUp() throws AWTException, IOException, Exception {
         WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver();
-        driver.get("https://qa-navyojna.epps-erp.in/");
+        driver.get("https://dev-navyojna.epps-erp.in/");
 
-        // Initialize Extent Reports
+        String timestamp = java.time.LocalDateTime.now().toString().replace(":", "-");
+        screenshotFolder = baseFolder + timestamp + "/screenshots/";
+        reportPath = baseFolder + timestamp + "/TestReport.html";
+        zipFilePath = baseFolder + timestamp + "/TestResults.zip";
+
+        Files.createDirectories(Paths.get(screenshotFolder));
+
         ExtentSparkReporter sparkReporter = new ExtentSparkReporter(reportPath);
-        sparkReporter.config().setDocumentTitle("Automation Test Report");
-        sparkReporter.config().setReportName("Test Execution Results");
-
         extent = new ExtentReports();
         extent.attachReporter(sparkReporter);
         extent.setSystemInfo("Tester", "Automation QA");
 
-        // Create screenshot directory
-        try {
-            Files.createDirectories(Paths.get(screenshotFolder));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+        ScreenRecorderUtil.startRecording("TestExecution");
         System.out.println("🚀 Test Execution Started...");
     }
 
@@ -62,116 +56,105 @@ public class TestExecutor1 {
         ExcelReader excelReader = new ExcelReader(excelPath);
         List<TestStep> testSteps = excelReader.readTestSteps();
 
+        if (testSteps == null || testSteps.isEmpty()) {
+            test = extent.createTest("No Test Steps Found");
+            test.fail("❌ No test steps were found in the Excel file.");
+            return;
+        }
+
         for (TestStep step : testSteps) {
-            test = extent.createTest("Step: " + step.getStepName());
-            System.out.println("🔹 Executing Step: " + step.getStepName());
-
-            boolean stepResult = executeStep(step);
-
-            if (stepResult) {
-                passedTests++;
-            } else {
-                failedTests++;
+            test = extent.createTest(step.getStepName());
+            boolean result = executeStep(step);
+            if (!result) {
+                String screenshotPath = takeScreenshot(step.getStepName());
+                test.fail("Step Failed").addScreenCaptureFromPath(screenshotPath);
             }
         }
     }
 
     public boolean executeStep(TestStep step) {
         try {
-            Thread.sleep((long) (step.getWaitTime() * 1000));
-            WebElement element = driver.findElement(By.xpath(step.getXpath()));
+            double waitTimeInSeconds = step.getWaitTime(); // Read from Excel (already in seconds)
 
+            if (waitTimeInSeconds > 0) {
+                long waitTimeInMillis = (long) (waitTimeInSeconds * 1000); // Convert to milliseconds
+                System.out.println("⏳ Waiting for " + waitTimeInSeconds + " seconds before executing: " + step.getStepName());
+                Thread.sleep(waitTimeInMillis);
+                test.info("⏳ Waited for " + waitTimeInSeconds + " seconds before executing: " + step.getStepName());
+            }
+
+            WebElement element = driver.findElement(By.xpath(step.getXpath()));
+         
             switch (step.getAction().toLowerCase()) {
-                case "open":
-                    driver.get(step.getXpath());
-                    test.pass("Opened URL: " + step.getXpath());
-                    break;
                 case "click":
                     element.click();
-                    test.pass("Clicked on element: " + step.getXpath());
+                    test.pass("✅ Clicked: " + step.getXpath());
+                    System.out.println("✅ Clicked: " + step.getXpath());
                     break;
+
                 case "enter":
                     element.sendKeys(step.getData());
-                    test.pass("Entered data: " + step.getData());
+                    test.pass("✅ Entered: " + step.getData());
+                    System.out.println("✅ Entered: " + step.getData());
                     break;
+
                 default:
-                    test.warning("Unknown action: " + step.getAction());
+                    test.warning("⚠ Unknown action: " + step.getAction());
+                    System.out.println("⚠ Unknown action: " + step.getAction());
             }
             return true;
+           
         } catch (Exception e) {
             String screenshotPath = takeScreenshot(step.getStepName());
-            test.fail("Error executing step: " + step.getAction() + " on " + step.getXpath())
-                .fail(e.getMessage())
-                .addScreenCaptureFromPath(screenshotPath);
+            test.fail("❌ Error: " + e.getMessage()).addScreenCaptureFromPath(screenshotPath);
+            System.out.println("❌ Error in step: " + step.getStepName() + " - " + e.getMessage());
             return false;
         }
     }
 
+
+
     public String takeScreenshot(String stepName) {
         try {
             File srcFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-            String filePath = screenshotFolder + stepName.replace(" ", "_") + "_" + System.currentTimeMillis() + ".png";
-            File destFile = new File(filePath);
-            Files.copy(srcFile.toPath(), destFile.toPath());
+            String filePath = screenshotFolder + stepName.replace(" ", "_") + ".png";
+            FileUtils.copyFile(srcFile, new File(filePath));
             return filePath;
         } catch (IOException e) {
-            e.printStackTrace();
             return "";
         }
     }
-
     @AfterTest
-    public void tearDown() {
-        System.out.println("🔻 Cleaning up resources...");
-
-        if (driver != null) {
-            driver.quit();
-        }
-
+    public void tearDown() throws IOException, Exception {
+        ScreenRecorderUtil.stopRecording();
+        driver.quit();
         extent.flush();
-        System.out.println("📄 Extent report generated: " + reportPath);
+        zipTestResults();
+        emailService.sendEmailWithAttachment("niranjan.mogare@epps-erp.in", "Automation Report", reportPath, zipFilePath, 587, 3);
 
-        // Zip Screenshots
-        String zipFilePath = baseFolder + timestamp + "/screenshots.zip";
-        zipScreenshots(screenshotFolder, zipFilePath);
 
-        // Open Extent Report in Browser
-        try {
-            File reportFile = new File(reportPath);
-            if (reportFile.exists()) {
-                Desktop.getDesktop().browse(reportFile.toURI());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
-        // Send Email with Report Attachment
-        String summaryMessage = "Test Summary: " + passedTests + " PASSED out of " + (passedTests + failedTests);
-        emailService.sendEmailWithAttachment(
-            "rishita.kolhe@epps-erp.in",
-            "Automation Test Report",
-            reportPath,
-            zipFilePath,
-            summaryMessage
-        );
-
-        System.exit(0);
+      
     }
 
-    public void zipScreenshots(String folderPath, String zipFilePath) {
+    public void zipTestResults() {
         try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipFilePath))) {
-            File folder = new File(folderPath);
-            File[] files = folder.listFiles();
-
-            if (files != null) {
-                for (File file : files) {
+            File folder = new File(screenshotFolder);
+            if (folder.exists() && folder.listFiles() != null) {
+                for (File file : folder.listFiles()) {
                     if (file.isFile()) {
-                        ZipEntry zipEntry = new ZipEntry(file.getName());
-                        zos.putNextEntry(zipEntry);
+                        zos.putNextEntry(new ZipEntry(file.getName()));
                         Files.copy(file.toPath(), zos);
                         zos.closeEntry();
                     }
                 }
+            }
+            // Add report file to ZIP
+            File reportFile = new File(reportPath);
+            if (reportFile.exists()) {
+                zos.putNextEntry(new ZipEntry(reportFile.getName()));
+                Files.copy(reportFile.toPath(), zos);
+                zos.closeEntry();
             }
         } catch (IOException e) {
             e.printStackTrace();

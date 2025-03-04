@@ -5,8 +5,8 @@
     <classes>
       <class name="classes.TestExecutor1">
         <methods>
-          <include name="setUp"/>
           <include name="executeTestSteps"/>
+          <include name="setUp"/>
           <include name="tearDown"/>
         </methods>
       </class> <!-- classes.TestExecutor1 -->
